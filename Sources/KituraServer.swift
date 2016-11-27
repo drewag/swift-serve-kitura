@@ -73,7 +73,23 @@ open class KituraServer: SwiftServe.Server {
             }
             try rawResponse.end()
         }
-        Kitura.addHTTPServer(onPort: port, with: router)
+        let sslConfig: SSLConfig?
+        if let httpsInfo = self.httpsInfo {
+            #if os(Linux)
+                sslConfig = SSLConfig(
+                    withCACertificateDirectory: nil,
+                    usingCertificateFile: httpsInfo.certificatePath,
+                    withKeyFile: httpsInfo.privateKeyPath,
+                    usingSelfSignedCerts: true
+                )
+            #else
+                sslConfig = nil
+            #endif
+        }
+        else {
+            sslConfig = nil
+        }
+        Kitura.addHTTPServer(onPort: port, with: router, withSSL: sslConfig)
             .failed(callback: { error in
                 print(error)
             })

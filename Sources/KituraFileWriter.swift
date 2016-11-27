@@ -12,9 +12,7 @@ import File
 public final class KituraFileWriter: FileWriter {
     private var file: File? = nil
 
-    public init() {}
-
-    public func openFileForWriting(at path: String) {
+    public init(path: String) {
         do {
             self.file = try File(path: path, mode: .appendWrite)
         }

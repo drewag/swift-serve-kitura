@@ -36,6 +36,9 @@ open class KituraServer: SwiftServe.Server {
     }
 
     public func start() throws {
+        ClientFactory.singleton.clientType = KituraClient.self
+        ClientFactory.singleton.requestType = KituraClientRequest.self
+
         let router = Router()
         router.all { rawRequest, rawResponse, next in
             var rawResponse = rawResponse

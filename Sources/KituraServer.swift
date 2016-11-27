@@ -41,11 +41,11 @@ open class KituraServer: SwiftServe.Server {
 
         let router = Router()
         router.all { rawRequest, rawResponse, next in
-            var rawResponse = rawResponse
+            let rawResponse = rawResponse
             let request = KituraRequest(request: rawRequest)
             let kituraResponse: KituraResponse
             do {
-                switch try self.router.route(request: request, to: rawRequest.route!) {
+                switch try self.router.route(request: request, to: rawRequest.parsedURL.path!) {
                 case .handled(let response):
                     self.log(response: response, to: request)
                     kituraResponse = response as! KituraResponse
@@ -74,6 +74,10 @@ open class KituraServer: SwiftServe.Server {
             try rawResponse.end()
         }
         Kitura.addHTTPServer(onPort: port, with: router)
+            .failed(callback: { error in
+                print(error)
+            })
+        Kitura.run()
     }
 }
 

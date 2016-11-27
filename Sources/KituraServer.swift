@@ -60,7 +60,7 @@ open class KituraServer: SwiftServe.Server {
                 self.log(response: response, to: request)
                 kituraResponse = response as! KituraResponse
             }
-            rawResponse = rawResponse.send(status: kituraResponse.kituraStatus)
+            rawResponse.statusCode = kituraResponse.kituraStatus
             for (key, value) in kituraResponse.headers {
                 rawResponse.headers[key] = value
             }

@@ -90,11 +90,31 @@ private class KituraRequest: Request {
 
     public var cookies: [String : String] {
         var cookies = [String:String]()
-
-        for (_, cookie) in self.request.cookies {
-            cookies[cookie.name] = cookie.value
+        for (key, value) in self.headers {
+            if key == "Cookie" {
+                let cookieNameValues = value.components(separatedBy: "; ")
+                for rawCookie in cookieNameValues {
+                    var name = ""
+                    var value = ""
+                    var foundSeparator = false
+                    for character in rawCookie.characters {
+                        guard !foundSeparator else  {
+                            value.append(character)
+                            continue
+                        }
+                        if character == "=" {
+                            foundSeparator = true
+                        }
+                        else {
+                            name.append(character)
+                        }
+                    }
+                    if foundSeparator {
+                        cookies[name] = value
+                    }
+                }
+            }
         }
-
         return cookies
     }
 

@@ -166,6 +166,10 @@ private class KituraRequest: Request {
         return URL(string: self.request.url)!
     }
 
+    public var ip: String {
+        return self.request.remoteAddress
+    }
+
     public var method: HTTPMethod {
         switch self.request.method {
         case .get:

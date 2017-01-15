@@ -148,12 +148,19 @@ private class KituraRequest: Request {
         return output
     }
 
+    private var readData: Data?
+
     public var data: Data {
+        if let data = self.readData {
+            return data
+        }
+
         do {
             var output = Data()
 
             let _ = try self.request.read(into: &output)
 
+            self.readData = output
             return output
         }
         catch let error {

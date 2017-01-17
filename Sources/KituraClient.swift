@@ -39,9 +39,20 @@ class KituraClientRequest: SwiftServe.ClientRequest {
     let headers: [String:String]
     let body: String
 
-    public required init(method: HTTPMethod, url: URL, headers: [String : String], body: String) {
+    public required init(
+        method: HTTPMethod,
+        url: URL,
+        headers: [String : String],
+        username: String?,
+        password: String?,
+        body: String
+        )
+    {
         self.method = method
-        self.urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)!
+        var components = URLComponents(url: url, resolvingAgainstBaseURL: false)!
+        components.user = username
+        components.password = password
+        self.urlComponents = components
         self.headers = headers
         self.body = body
     }

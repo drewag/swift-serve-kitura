@@ -104,6 +104,8 @@ private class KituraRequest: Request {
         self.request = request
     }
 
+    public let databaseConnection = DatabaseConnection()
+
     public var host: String {
         return self.request.hostname
     }

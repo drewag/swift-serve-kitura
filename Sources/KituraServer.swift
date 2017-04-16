@@ -173,7 +173,7 @@ private class KituraRequest: Request {
     }
 
     public var endpoint: URL {
-        return URL(string: self.request.url)!
+        return self.request.urlURL
     }
 
     public var ip: String {

@@ -22,6 +22,7 @@ open class KituraServer: SwiftServe.Server {
     let httpsInfo: HTTPSInfo?
 
     public var extraLogForRequest: ((SwiftServe.Request) -> String?)?
+    public var postProcessResponse: ((inout Response) -> ())?
 
     public required init(port: Int, router: SwiftServe.Router) throws {
         self.port = port
@@ -43,24 +44,27 @@ open class KituraServer: SwiftServe.Server {
         router.all { rawRequest, rawResponse, next in
             let rawResponse = rawResponse
             let request = KituraRequest(request: rawRequest)
-            let kituraResponse: KituraResponse
+            var response: Response
             do {
                 let path = rawRequest.parsedURL.path!.removingPercentEncoding!
                 switch try self.router.route(request: request, to: path) {
-                case .handled(let response):
-                    self.log(response: response, to: request)
-                    kituraResponse = response as! KituraResponse
+                case .handled(let newResponse):
+                    response = newResponse
                 case .unhandled:
-                    let response = self.unhandledResponse(to: request)
-                    self.log(response: response, to: request)
-                    kituraResponse = response as! KituraResponse
+                    let newResponse = self.unhandledResponse(to: request)
+                    response = newResponse
                 }
             }
             catch let error {
-                let response = self.response(for: error, from: request)
-                self.log(response: response, to: request)
-                kituraResponse = response as! KituraResponse
+                let newResponse = self.response(for: error, from: request)
+                response = newResponse
             }
+
+            self.postProcessResponse?(&response)
+            self.log(response: response, to: request)
+
+            let kituraResponse = response as! KituraResponse
+
             rawResponse.statusCode = kituraResponse.kituraStatus
             for (key, value) in kituraResponse.headers {
                 rawResponse.headers[key] = value
@@ -190,6 +194,8 @@ private class KituraRequest: Request {
             return .put
         case .delete:
             return .delete
+        case .options:
+            return .options
         default:
             return .any
         }
@@ -216,7 +222,7 @@ private class KituraResponse: Response {
     var kituraStatus: HTTPStatusCode {
         return HTTPStatusCode(rawValue: self.status.rawValue) ?? .unknown
     }
-    let headers: [String:String]
+    var headers: [String:String]
 
     init(body: Body, status: HTTPStatus, headers: [String:String]) {
         self.status = status

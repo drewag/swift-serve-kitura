@@ -10,6 +10,7 @@ import Foundation
 import SwiftServe
 import Kitura
 import KituraNet
+import SwiftPlusPlus
 
 open class KituraServer: SwiftServe.Server {
     let port: Int

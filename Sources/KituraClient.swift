@@ -9,7 +9,7 @@
 import Foundation
 import SwiftServe
 import KituraNet
-import SwiftPlusPlus
+import Swiftlier
 
 class KituraClient: Client {
     public func respond(to request: SwiftServe.ClientRequest) -> SwiftServe.ClientResponse {

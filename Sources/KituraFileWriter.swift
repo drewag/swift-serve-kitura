@@ -6,15 +6,19 @@
 //
 //
 
+import Foundation
 import SwiftServe
-import File
+import Swiftlier
 
 public final class KituraFileWriter: FileWriter {
-    private var file: File? = nil
+    private var handle: FileHandle? = nil
 
     public init(path: String) {
         do {
-            self.file = try File(path: path, mode: .appendWrite)
+            let url = URL(fileURLWithPath: path)
+            let path = FileSystem.default.path(from: url)
+            let file = try path.file ?? path.createFile(containing: Data(), canOverwrite: true)
+            self.handle = try file.handleForWriting()
         }
         catch let error {
             print("Error opening log: \(error)")
@@ -22,27 +26,14 @@ public final class KituraFileWriter: FileWriter {
     }
 
     public func write(_ text: String) -> Bool {
-        guard let file = self.file else {
+        guard let handle = self.handle else {
             print(text)
             return false
         }
 
-        do {
-            try file.write(text)
-            try file.write("\n")
-            try file.flush(deadline: 0)
-            return true
-        }
-        catch {
-            print(text)
-            return false
-        }
+        handle.write(text.data(using: .utf8) ?? Data())
+        handle.write("\n".data(using: .utf8) ?? Data())
+        handle.synchronizeFile()
+        return true
     }
 }
-
-extension File {
-    func write(_ string: String) throws {
-        try self.write(string, deadline: 0)
-    }
-}
-

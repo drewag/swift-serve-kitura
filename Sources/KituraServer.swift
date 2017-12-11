@@ -11,6 +11,8 @@ import SwiftServe
 import Kitura
 import KituraNet
 import Swiftlier
+import SQL
+import PostgreSQL
 
 open class KituraServer: SwiftServe.Server {
     let port: Int
@@ -110,7 +112,7 @@ private class KituraRequest: Request {
         self.request = request
     }
 
-    public let databaseConnection = DatabaseConnection()
+    public let databaseConnection: Connection = PostgreSQLConnection()
 
     public var host: String {
         return self.request.hostname
@@ -125,7 +127,7 @@ private class KituraRequest: Request {
                     var name = ""
                     var value = ""
                     var foundSeparator = false
-                    for character in rawCookie.characters {
+                    for character in rawCookie {
                         guard !foundSeparator else  {
                             value.append(character)
                             continue

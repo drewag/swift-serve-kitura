@@ -38,7 +38,7 @@ class KituraClientRequest: SwiftServe.ClientRequest {
     let urlComponents: URLComponents
     let method: HTTPMethod
     let headers: [String:String]
-    let body: String
+    let body: Data
 
     public required init(
         method: HTTPMethod,
@@ -46,7 +46,7 @@ class KituraClientRequest: SwiftServe.ClientRequest {
         headers: [String : String],
         username: String?,
         password: String?,
-        body: String
+        body: Data
         )
     {
         self.method = method

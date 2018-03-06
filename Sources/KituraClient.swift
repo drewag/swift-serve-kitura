@@ -90,12 +90,19 @@ class KituraClientResponse: SwiftServe.ClientResponse {
         self.response = response
     }
 
+    private var bodyCache: Data?
+
     public var body: Data {
+        if let bodyCache = self.bodyCache {
+            return bodyCache
+        }
+
         do {
             var output = Data()
 
             let _ = try self.response.read(into: &output)
 
+            self.bodyCache = output
             return output
         }
         catch let error {
@@ -105,7 +112,6 @@ class KituraClientResponse: SwiftServe.ClientResponse {
     }
 
     public var status: HTTPStatus {
-        return HTTPStatus(rawValue: self.response.statusCode.rawValue) ?? .internalServerError
+        return HTTPStatus(rawValue: self.response.statusCode.rawValue)
     }
-
 }

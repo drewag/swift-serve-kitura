@@ -59,11 +59,15 @@ class KituraClientRequest: SwiftServe.ClientRequest {
     }
 
     var options: [KituraNet.ClientRequest.Options] {
+        var path = self.urlComponents.path
+        if let query = self.urlComponents.query {
+            path += "?\(query)"
+        }
         var options: [KituraNet.ClientRequest.Options] = [
             .method(self.method.rawValue),
             .headers(self.headers),
-            .path(self.urlComponents.path),
-        ]
+            .path(path),
+            ]
         if let schema = self.urlComponents.scheme {
             options.append(.schema(schema))
         }

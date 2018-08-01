@@ -49,8 +49,7 @@ open class KituraServer: SwiftServe.Server {
             let request = KituraRequest(request: rawRequest)
             var response: Response
             do {
-                let path = rawRequest.parsedURL.path!.removingPercentEncoding!
-                switch try self.router.route(request: request, to: path) {
+                switch try self.router.route(request: request, to: rawRequest.parsedURL.path!) {
                 case .handled(let newResponse):
                     response = newResponse
                 case .unhandled:

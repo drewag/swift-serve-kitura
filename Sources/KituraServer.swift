@@ -14,7 +14,7 @@ import Swiftlier
 import SQL
 import PostgreSQL
 
-open class KituraServer: SwiftServe.Server {
+open class KituraServer: SwiftServe.Server, ErrorGenerating {
     let port: Int
     let router: SwiftServe.Router
 
@@ -49,7 +49,9 @@ open class KituraServer: SwiftServe.Server {
             let request = KituraRequest(request: rawRequest)
             var response: Response
             do {
-                let path = rawRequest.parsedURL.path!.removingPercentEncoding!
+                guard let path = rawRequest.parsedURL.path?.removingPercentEncoding else {
+                    throw self.error("routing", because: "it has an invalid path")
+                }
                 switch try self.router.route(request: request, to: path) {
                 case .handled(let newResponse):
                     response = newResponse

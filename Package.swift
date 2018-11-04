@@ -4,6 +4,9 @@ import PackageDescription
 
 let package = Package(
     name: "SwiftServeKitura",
+    products: [
+        .library(name: "SwiftServeKitura", targets: ["SwiftServeKitura"]),
+    ],
     dependencies: [
         .package(url: "https://github.com/drewag/swift-serve.git", from: "13.0.0"),
         .package(url: "https://github.com/IBM-Swift/Kitura.git", from: "2.5.0"),

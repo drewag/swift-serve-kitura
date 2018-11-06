@@ -110,6 +110,9 @@ open class KituraServer: SwiftServe.Server, ErrorGenerating {
 private class KituraRequest: Request {
     let request: RouterRequest
 
+    public var preprocessStack = RequestProcessStack()
+    public var postprocessStack = RequestProcessStack()
+
     init(request: RouterRequest) {
         self.request = request
     }

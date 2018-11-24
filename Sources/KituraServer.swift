@@ -209,16 +209,17 @@ private class KituraRequest: Request {
         }
     }
 
-    public func response(withData data: Data, status: HTTPStatus, headers: [String : String]) -> Response {
-        return KituraResponse(body: .data(data), status: status, headers: headers)
+    public func response(withData data: Data, status: HTTPStatus, error: ReportableError?, headers: [String : String]) -> Response {
+        return KituraResponse(body: .data(data), status: status, error: error, headers: headers)
     }
 
-    public func response(withFileAt path: String, status: HTTPStatus, headers: [String:String]) throws -> Response {
-        return KituraResponse(body: .file(path), status: status, headers: headers)
+    public func response(withFileAt path: String, status: HTTPStatus, error: ReportableError?, headers: [String:String]) throws -> Response {
+        return KituraResponse(body: .file(path), status: status, error: error, headers: headers)
     }
 }
 
 private class KituraResponse: Response {
+    public let error: ReportableError?
     public var status: HTTPStatus
 
     enum Body {
@@ -232,9 +233,10 @@ private class KituraResponse: Response {
     }
     var headers: [String:String]
 
-    init(body: Body, status: HTTPStatus, headers: [String:String]) {
+    init(body: Body, status: HTTPStatus, error: ReportableError?, headers: [String:String]) {
         self.status = status
         self.body = body
         self.headers = headers
+        self.error = error
     }
 }

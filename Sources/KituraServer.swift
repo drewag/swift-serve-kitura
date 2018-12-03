@@ -24,19 +24,22 @@ open class KituraServer: SwiftServe.Server, ErrorGenerating {
     }
     let httpsInfo: HTTPSInfo?
 
+    public let errorViewRoot: String
     public var extraLogForRequest: ((SwiftServe.Request) -> String?)?
     public var postProcessResponse: ((inout Response) -> ())?
 
-    public required init(port: Int, router: SwiftServe.Router) throws {
+    public required init(port: Int, router: SwiftServe.Router, errorViewRoot: String) throws {
         self.port = port
         self.router = router
         self.httpsInfo = nil
+        self.errorViewRoot = errorViewRoot
     }
 
-    public required init(port: Int, router: SwiftServe.Router, certificatePath: String, privateKeyPath: String) throws {
+    public required init(port: Int, router: SwiftServe.Router, errorViewRoot: String, certificatePath: String, privateKeyPath: String) throws {
         self.port = port
         self.router = router
         self.httpsInfo = HTTPSInfo(certificatePath: certificatePath, privateKeyPath: privateKeyPath)
+        self.errorViewRoot = errorViewRoot
     }
 
     public func start() throws {

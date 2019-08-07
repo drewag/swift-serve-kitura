@@ -13,8 +13,9 @@ import KituraNet
 import Swiftlier
 import SQL
 import PostgreSQL
+import Decree
 
-open class KituraServer: SwiftServe.Server, ErrorGenerating {
+open class KituraServer: SwiftServe.Server {
     let port: Int
     let router: SwiftServe.Router
 
@@ -43,9 +44,6 @@ open class KituraServer: SwiftServe.Server, ErrorGenerating {
     }
 
     public func start() throws {
-        ClientFactory.singleton.clientType = KituraClient.self
-        ClientFactory.singleton.requestType = KituraClientRequest.self
-
         let router = Router()
         router.all { rawRequest, rawResponse, next in
             let rawResponse = rawResponse
@@ -53,7 +51,7 @@ open class KituraServer: SwiftServe.Server, ErrorGenerating {
             var response: Response
             do {
                 guard let path = rawRequest.parsedURL.path?.removingPercentEncoding else {
-                    throw self.error("routing", because: "it has an invalid path")
+                    throw GenericSwiftlierError("routing", because: "it has an invalid path")
                 }
                 switch try self.router.route(request: request, to: path) {
                 case .handled(let newResponse):
@@ -195,34 +193,21 @@ private class KituraRequest: Request {
         return self.request.remoteAddress
     }
 
-    public var method: HTTPMethod {
-        switch self.request.method {
-        case .get:
-            return .get
-        case .post:
-            return .post
-        case .put:
-            return .put
-        case .delete:
-            return .delete
-        case .options:
-            return .options
-        default:
-            return .any
-        }
+    public var method: Decree.Method {
+        return Decree.Method(rawValue: self.request.method.rawValue)
     }
 
-    public func response(withData data: Data, status: HTTPStatus, error: ReportableError?, headers: [String : String]) -> Response {
+    public func response(withData data: Data, status: HTTPStatus, error: SwiftlierError?, headers: [String : String]) -> Response {
         return KituraResponse(body: .data(data), status: status, error: error, headers: headers)
     }
 
-    public func response(withFileAt path: String, status: HTTPStatus, error: ReportableError?, headers: [String:String]) throws -> Response {
+    public func response(withFileAt path: String, status: HTTPStatus, error: SwiftlierError?, headers: [String:String]) throws -> Response {
         return KituraResponse(body: .file(path), status: status, error: error, headers: headers)
     }
 }
 
 private class KituraResponse: Response {
-    public let error: ReportableError?
+    public let error: SwiftlierError?
     public var status: HTTPStatus
 
     enum Body {
@@ -236,7 +221,7 @@ private class KituraResponse: Response {
     }
     var headers: [String:String]
 
-    init(body: Body, status: HTTPStatus, error: ReportableError?, headers: [String:String]) {
+    init(body: Body, status: HTTPStatus, error: SwiftlierError?, headers: [String:String]) {
         self.status = status
         self.body = body
         self.headers = headers

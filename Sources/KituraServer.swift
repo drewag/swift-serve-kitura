@@ -154,8 +154,8 @@ private class KituraRequest: Request {
         return cookies
     }
 
-    public var headers: [String : String] {
-        var output = [String:String]()
+    public var headers: [CaseInsensitiveKey : String] {
+        var output = [CaseInsensitiveKey:String]()
 
         for (key, value) in self.request.headers {
             output[key] = value

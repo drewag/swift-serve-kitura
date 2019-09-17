@@ -11,7 +11,7 @@ let package = Package(
         .library(name: "SwiftServeKitura", targets: ["SwiftServeKitura"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/drewag/swift-serve.git", from: "17.0.0"),
+        .package(url: "https://github.com/drewag/swift-serve.git", from: "18.0.0"),
         .package(url: "https://github.com/IBM-Swift/Kitura.git", from: "2.5.0"),
     ],
     targets: [
